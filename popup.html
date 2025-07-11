@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Udemy Course Date</title>
+    <style>
+      body {
+        width: 300px;
+        min-height: 150px;
+        margin: 0;
+        padding: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+        background: #f8f9fa;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .icon {
+        font-size: 20px;
+      }
+
+      .title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #212529;
+        margin: 0;
+      }
+
+      .content {
+        margin-bottom: 16px;
+      }
+
+      .status {
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        font-size: 13px;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #cce7ff;
+        color: #004085;
+        border: 1px solid #b8daff;
+      }
+
+      .course-info {
+        background: white;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 12px;
+      }
+
+      .course-date {
+        font-weight: 600;
+        color: #212529;
+        font-size: 16px;
+      }
+
+      .course-title {
+        color: #6c757d;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .refresh-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        width: 100%;
+        transition: background 0.2s;
+      }
+
+      .refresh-btn:hover {
+        background: #0056b3;
+      }
+
+      .refresh-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+
+      .loading {
+        text-align: center;
+        color: #6c757d;
+        padding: 20px;
+      }
+
+      .version {
+        font-size: 11px;
+        color: #adb5bd;
+        text-align: center;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #dee2e6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <span class="icon">📅</span>
+      <h1 class="title">Udemy Course Date</h1>
+    </div>
+
+    <div class="content">
+      <div id="loading" class="loading">
+        <div>Checking course information...</div>
+      </div>
+
+      <div id="not-course-page" class="status info" style="display: none">This extension only works on Udemy course pages.</div>
+
+      <div id="course-data" style="display: none">
+        <div class="course-info">
+          <div class="course-title" id="course-title">-</div>
+          <div class="course-date" id="course-date">-</div>
+        </div>
+
+        <div class="status success" id="success-status" style="display: none">✅ Course creation date successfully displayed!</div>
+
+        <div class="status error" id="error-status" style="display: none">❌ Course information not found</div>
+
+        <button class="refresh-btn" id="refresh-btn">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <div class="version">v1.0 - Udemy Course Creation Date</div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+/* styles.css - Extension stilleri */
+.course-creation-date {
+  font-family: "Udemy Sans", Vazirmatn, "SF Pro Text", -apple-system,
+    BlinkMacSystemFont, Roboto, "Segoe UI", Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.creation-date-info {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.creation-date {
+  color: #fff;
+}
+
+@media (max-width: 1080px) {
+  .creation-date {
+    color: #2a2b3f;
+    margin-bottom: 8px;
+  }
+}
