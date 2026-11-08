@@ -15,14 +15,39 @@
     return courseId ? parseInt(courseId) : null;
   }
 
-  // Format date
+  // Format date as MM/YYYY, matching Udemy's "Last updated" format
   function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "numeric",
-      year: "numeric",
-    });
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${month}/${date.getFullYear()}`;
   }
+
+  // Labels in the page language (falls back to English)
+  const LABELS = {
+    en: { created: "Created", loading: "Loading creation date…", error: "Unable to fetch creation date" },
+    tr: { created: "Oluşturulma tarihi:", loading: "Oluşturulma tarihi yükleniyor…", error: "Oluşturulma tarihi alınamadı" },
+    de: { created: "Erstellt" },
+    fr: { created: "Créé le" },
+    es: { created: "Creado" },
+    it: { created: "Creato" },
+    pt: { created: "Criado em" },
+    ja: { created: "作成日" },
+    ko: { created: "생성일" },
+    zh: { created: "创建于" },
+  };
+
+  function getLabel(key) {
+    const lang = (document.documentElement.lang || "en").slice(0, 2).toLowerCase();
+    return LABELS[lang]?.[key] || LABELS.en[key];
+  }
+
+  // Calendar icon used when Udemy's own icon can't be cloned
+  const FALLBACK_ICON = `
+    <svg class="creation-date-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"
+         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+      <path d="M16 2v4M8 2v4M3 10h18"></path>
+    </svg>`;
 
   // Fetch course data from API
   async function fetchCourseData(courseId) {
@@ -136,45 +161,57 @@
     anchor.insertAdjacentElement("beforebegin", element);
   }
 
+  // Build the date row so it looks like Udemy's own "Last updated" row:
+  // same icon, same text color and size
+  function buildDateElement(text, stateClass) {
+    const container = document.createElement("div");
+    container.className = `course-creation-date ${stateClass || ""}`.trim();
+
+    const lastUpdate = findLastUpdateElement();
+    const udemyIcon = lastUpdate?.querySelector("svg");
+    if (udemyIcon) {
+      const icon = udemyIcon.cloneNode(true);
+      icon.classList.add("creation-date-icon");
+      container.appendChild(icon);
+    } else {
+      container.insertAdjacentHTML("beforeend", FALLBACK_ICON);
+    }
+
+    const label = document.createElement("span");
+    label.className = "creation-date";
+    label.textContent = text;
+    container.appendChild(label);
+
+    // Copy typography from the "Last updated" text so both rows match
+    if (lastUpdate) {
+      const style = getComputedStyle(lastUpdate);
+      container.style.color = style.color;
+      container.style.fontSize = style.fontSize;
+      container.style.lineHeight = style.lineHeight;
+      container.style.fontFamily = style.fontFamily;
+    }
+
+    return container;
+  }
+
   // Display creation date
   async function displayCreationDate(courseData) {
     const anchor = await waitForInsertionPoint();
-
-    const dateContainer = document.createElement("div");
-    dateContainer.className = "course-creation-date";
-    dateContainer.innerHTML = `
-        <div class="creation-date-info">
-          <span class="creation-date">📅&nbsp; Created ${formatDate(courseData.created)}</span>
-        </div>
-      `;
-
-    insertDateElement(dateContainer, anchor);
+    const text = `${getLabel("created")} ${formatDate(courseData.created)}`;
+    insertDateElement(buildDateElement(text), anchor);
   }
 
   // Show loading indicator
   function showLoadingIndicator() {
-    const loadingIndicator = document.createElement("div");
-    loadingIndicator.className = "course-creation-date loading";
-    loadingIndicator.innerHTML = `
-        <div class="creation-date-info">
-          <span class="creation-date">📅&nbsp; Loading...</span>
-        </div>
-      `;
-
-    insertDateElement(loadingIndicator, findInsertionPoint());
+    insertDateElement(buildDateElement(getLabel("loading"), "loading"), findInsertionPoint());
   }
 
-  // Show error
+  // Show error (replaces the loading indicator)
   function showError(error) {
     const loadingIndicator = document.querySelector(".course-creation-date.loading");
-    if (loadingIndicator) {
-      loadingIndicator.innerHTML = `
-          <div class="creation-date-info error">
-            <span class="creation-date">📅&nbsp; Unable to fetch creation date (${error.message})</span>
-          </div>
-        `;
-      loadingIndicator.classList.remove("loading");
-    }
+    if (!loadingIndicator) return;
+    const errorElement = buildDateElement(`${getLabel("error")} (${error.message})`, "error");
+    loadingIndicator.replaceWith(errorElement);
   }
 
   // Main function

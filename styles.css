@@ -1,24 +1,33 @@
-/* styles.css - Extension stilleri */
+/* styles.css - Extension styles
+ * Color, font size and line height are copied at runtime from Udemy's own
+ * "Last updated" text (see buildDateElement in content.js). The values below
+ * are only fallbacks, so the row inherits the surrounding colors on both the
+ * dark desktop banner and the light mobile layout.
+ */
 .course-creation-date {
-  font-family: "Udemy Sans", Vazirmatn, "SF Pro Text", -apple-system,
-    BlinkMacSystemFont, Roboto, "Segoe UI", Helvetica, Arial, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  margin-bottom: 8px;
-}
-
-.creation-date-info {
   display: flex;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: inherit;
+  font-family: inherit;
   font-size: 14px;
   line-height: 1.4;
 }
 
-.creation-date {
-  color: #fff;
+.creation-date-icon {
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  min-width: 16px;
+  min-height: 16px;
 }
 
-@media (max-width: 1080px) {
-  .creation-date {
-    color: #2a2b3f;
-  }
+.course-creation-date.loading .creation-date {
+  opacity: 0.7;
+}
+
+.course-creation-date.error .creation-date {
+  opacity: 0.8;
+  font-style: italic;
 }
