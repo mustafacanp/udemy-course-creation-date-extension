@@ -161,14 +161,51 @@
     anchor.insertAdjacentElement("beforebegin", element);
   }
 
+  // Udemy's calendar icon may sit next to the "Last updated" text rather than
+  // inside it, so search outward up to the whole row. The calendar icon comes
+  // before the language (globe) icon, so the first match is the right one.
+  function findUdemyIcon(lastUpdate) {
+    if (!lastUpdate) return null;
+    const row = getRowContainer(lastUpdate);
+    let node = lastUpdate;
+    while (node) {
+      const icon = node.querySelector("svg");
+      if (icon) return icon;
+      if (node === row) break;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  // Copy typography from the "Last updated" text so both rows match
+  function syncTypography(container) {
+    const lastUpdate = findLastUpdateElement();
+    if (!lastUpdate) return;
+    const style = getComputedStyle(lastUpdate);
+    container.style.color = style.color;
+    container.style.fontSize = style.fontSize;
+    container.style.lineHeight = style.lineHeight;
+    container.style.fontFamily = style.fontFamily;
+  }
+
+  // Udemy switches colors at its mobile breakpoint (dark banner -> light page),
+  // so re-sync when the window is resized after the row was inserted
+  let resizeFrame = null;
+  window.addEventListener("resize", () => {
+    if (resizeFrame) return;
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = null;
+      document.querySelectorAll(".course-creation-date").forEach(syncTypography);
+    });
+  });
+
   // Build the date row so it looks like Udemy's own "Last updated" row:
   // same icon, same text color and size
   function buildDateElement(text, stateClass) {
     const container = document.createElement("div");
     container.className = `course-creation-date ${stateClass || ""}`.trim();
 
-    const lastUpdate = findLastUpdateElement();
-    const udemyIcon = lastUpdate?.querySelector("svg");
+    const udemyIcon = findUdemyIcon(findLastUpdateElement());
     if (udemyIcon) {
       const icon = udemyIcon.cloneNode(true);
       icon.classList.add("creation-date-icon");
@@ -182,15 +219,7 @@
     label.textContent = text;
     container.appendChild(label);
 
-    // Copy typography from the "Last updated" text so both rows match
-    if (lastUpdate) {
-      const style = getComputedStyle(lastUpdate);
-      container.style.color = style.color;
-      container.style.fontSize = style.fontSize;
-      container.style.lineHeight = style.lineHeight;
-      container.style.fontFamily = style.fontFamily;
-    }
-
+    syncTypography(container);
     return container;
   }
 
